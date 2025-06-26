@@ -31,8 +31,8 @@ public interface IVehicleService
     /// Creates a new vehicle.
     /// </summary>
     /// <param name="vehicle"></param>
-    /// <returns></returns>
-    void CreateVehicle(Vehicle vehicle);
+    /// <returns>Returns the ID of the created vehicle.</returns>
+    int CreateVehicle(Vehicle vehicle);
 
     /// <summary>
     /// Updates an existing vehicle by its ID. 

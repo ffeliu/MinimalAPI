@@ -13,10 +13,12 @@ public class VehicleService : IVehicleService
         _db = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public void CreateVehicle(Vehicle vehicle)
+    public int CreateVehicle(Vehicle vehicle)
     {
         _db.Add(vehicle);
         _db.SaveChanges();
+
+        return vehicle.Id;
     }
 
     public void DeleteVehicle(Vehicle vehicle)
