@@ -34,11 +34,6 @@ public class VehicleService : IVehicleService
             throw new ArgumentOutOfRangeException("Paging must be non-negative and pageSize must be positive.");
         }
 
-        if (paging == 0)
-        {
-            return _db.Vehicles.ToList();
-        }
-
         // Implement pagination logic
         var vehicles = _db.Vehicles
             .OrderBy(v => v.Id)

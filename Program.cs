@@ -45,7 +45,7 @@ app.MapPost("/login", ([FromBody] LoginDTO loginDTO, IAdminService adminService)
     }
 
     return Results.Unauthorized();
-});
+}).WithTags("Authentication");
 
 app.MapPost("/vehicles", ([FromBody] VehicleDTO vehicleDTO, IVehicleService vehicleService) =>
 {
@@ -65,7 +65,79 @@ app.MapPost("/vehicles", ([FromBody] VehicleDTO vehicleDTO, IVehicleService vehi
     vehicleService.CreateVehicle(vehicle);
 
     return Results.Created($"/vehicles/{vehicle.Id}", vehicle);
-});
+}).WithTags("Vehicles");
+
+app.MapGet("/vehicles", ([FromQuery] int paging, [FromQuery] int pageSize, IVehicleService vehicleService) =>
+{
+    return vehicleService.GetAllVehicles(paging, pageSize);
+}).WithTags("Vehicles");
+
+app.MapGet("/vehicles/{id:int}", ([FromRoute] int id, IVehicleService vehicleService) =>
+{
+    try
+    {
+        var vehicle = vehicleService.GetVehicleById(id);
+        return Results.Ok(vehicle);
+    }
+    catch (KeyNotFoundException)
+    {
+        return Results.NotFound($"Vehicle with ID {id} not found.");
+    }
+}).WithTags("Vehicles");
+
+app.MapPut("/vehicles/{id:int}", ([FromRoute] int id, [FromBody] VehicleDTO vehicleDTO, IVehicleService vehicleService) =>
+{
+    if (vehicleDTO == null)
+    {
+        return Results.BadRequest("Vehicle data is required.");
+    }
+
+    var vehicle = vehicleService.GetVehicleById(id);
+
+    if (vehicle == null)
+    {
+        return Results.NotFound($"Vehicle with ID {id} not found.");
+    }
+
+    vehicle = new Vehicle
+    {
+        Id = id,
+        Name = vehicleDTO.Name,
+        Color = vehicleDTO.Color,
+        Brand = vehicleDTO.Brand,
+        Year = vehicleDTO.Year
+    };
+
+    try
+    {
+        vehicleService.UpdateVehicle(vehicle);
+        return Results.NoContent();
+    }
+    catch (KeyNotFoundException)
+    {
+        return Results.NotFound($"Vehicle with ID {id} not found.");
+    }
+}).WithTags("Vehicles");
+
+app.MapDelete("/vehicles/{id:int}", ([FromRoute] int id, IVehicleService vehicleService) =>
+{
+    try
+    {
+        var vehicle = vehicleService.GetVehicleById(id);
+
+        if (vehicle == null)
+        {
+            return Results.NotFound($"Vehicle with ID {id} not found.");
+        }
+
+        vehicleService.DeleteVehicle(vehicle);
+        return Results.NoContent();
+    }
+    catch (KeyNotFoundException)
+    {
+        return Results.NotFound($"Vehicle with ID {id} not found.");
+    }
+}).WithTags("Vehicles");
 
 app.Run();
 

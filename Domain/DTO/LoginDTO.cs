@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace minimalapi.domain.dto
 {
-    public class LoginDTO
+    public record LoginDTO
     {
         public string Username { get; set; }
         public string Password { get; set; }
