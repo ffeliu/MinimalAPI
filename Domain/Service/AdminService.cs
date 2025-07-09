@@ -21,12 +21,12 @@ public class AdminService : IAdminService
             throw new ArgumentNullException(nameof(login));
         }
 
-        if (string.IsNullOrEmpty(login.Username) || string.IsNullOrEmpty(login.Password))
+        if (string.IsNullOrEmpty(login.Email) || string.IsNullOrEmpty(login.Password))
         {
             throw new ArgumentException("Username and password must be provided.");
         }
 
-        var admin = _db.Admins.Where(a => a.Name == login.Username && a.Password == login.Password).FirstOrDefault();
+        var admin = _db.Admins.Where(a => a.Email == login.Email && a.Password == login.Password).FirstOrDefault();
 
         if (admin == null)
         {
@@ -34,5 +34,13 @@ public class AdminService : IAdminService
         }
 
         return admin;
+    }
+
+    public int CreateAdmin(Admin admin)
+    {
+        _db.Add(admin);
+        _db.SaveChanges();
+
+        return admin.Id;
     }
 }

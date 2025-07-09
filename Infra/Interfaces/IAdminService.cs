@@ -11,4 +11,5 @@ public interface IAdminService
     /// <param name="login">Login credentials.</param>
     /// <returns>Authenticated admin user.</returns>
     Admin Authenticate(LoginDTO login);
+    int CreateAdmin(Admin admin);
 }

@@ -1,4 +1,5 @@
 using System.Data.Entity;
+using Microsoft.AspNetCore.Http.HttpResults;
 using minimalapi.domain.db;
 using minimalapi.domain.entity;
 using minimalapi.domain.interfaces;
@@ -15,10 +16,38 @@ public class VehicleService : IVehicleService
 
     public int CreateVehicle(Vehicle vehicle)
     {
+        validateVehicle(vehicle);
+
         _db.Add(vehicle);
         _db.SaveChanges();
 
         return vehicle.Id;
+    }
+
+    private static void validateVehicle(Vehicle vehicle)
+    {
+        var validationErrors = new ValidationErrors();
+
+        if (vehicle == null)
+            validationErrors.Messages.Add("Vehicle cannot be null.");
+
+        if (string.IsNullOrEmpty(vehicle.Name))
+            validationErrors.Messages.Add("Vehicle name cannot be null or empty.");
+
+        if (string.IsNullOrEmpty(vehicle.Brand))
+            validationErrors.Messages.Add("Vehicle brand cannot be null or empty.");
+
+        if (string.IsNullOrEmpty(vehicle.Color))
+            validationErrors.Messages.Add("Vehicle color cannot be null or empty.");
+
+        if (vehicle.Year < 1950 || vehicle.Year > DateTime.Now.Year)
+            validationErrors.Messages.Add($"Vehicle year must be between 1950 and {DateTime.Now.Year + 1}.");
+
+        if (validationErrors.Messages.Any())
+        {
+            throw new ArgumentException("Invalid vehicle data: " + string.Join("; ", validationErrors.Messages),
+            nameof(vehicle));
+        }
     }
 
     public void DeleteVehicle(Vehicle vehicle)
@@ -71,7 +100,9 @@ public class VehicleService : IVehicleService
 
     public void UpdateVehicle(Vehicle vehicle)
     {
-        _db.Update(vehicle);
+        validateVehicle(vehicle);
+
+        _db.Update(vehicle);    
         _db.SaveChanges();
     }
 }
